@@ -68,12 +68,19 @@ def start_screen():
             fon = pygame.transform.scale(load_image('fon_blue.jpg'), screen_size)
         elif lvl == '3':
             fon = pygame.transform.scale(load_image('fon_red.jpg'), screen_size)
+        elif lvl == '4':
+            fon = pygame.transform.scale(load_image('fon_black.jpg'), screen_size)
+        elif lvl == '5':
+            fon = pygame.transform.scale(load_image('fon_bigblack.jpg'), screen_size)
         screen.blit(fon, (0, 0))
         font = pygame.font.Font(None, 40)
         text_coord = 50
 
         for line in intro_text:
-            string_rendered = font.render(line, 1, pygame.Color('black'))
+            if lvl not in '45':
+                string_rendered = font.render(line, 1, pygame.Color('black'))
+            else:
+                string_rendered = font.render(line, 1, pygame.Color('white'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
@@ -94,16 +101,31 @@ def start_screen():
 
 
 def final_screen():
+    with open('progress_steps.txt', mode='a', encoding='UTF-8') as f:
+        f.write(f' {steps}')
     with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
         lvl = f.read()
-        intro_text = ['Лабиринт', '', f'Уровень {lvl} пройден', f'Ходы: {steps}', '', '', '', 'Нажмите пробел для завершения']
-        fon = pygame.transform.scale(load_image('fon_purple.jpg'), screen_size)
+        if lvl != '5':
+            intro_text = ['Лабиринт', '', f'Уровень {lvl} пройден', f'Ходы: {steps}', '', '', '', 'Нажмите пробел для завершения']
+            fon = pygame.transform.scale(load_image('fon_purple.jpg'), screen_size)
+        else:
+            with open('progress_steps.txt', mode='r', encoding='UTF-8') as f:
+                all_steps = sum(list(map(int, f.read().split())))
+            intro_text = ['Лабиринт', 'Уровень 5 пройден', 'Игра пройдена !!!', f'Ходы на 5 уровне: {steps}',
+                          f'Ходы в игре: {all_steps}', '', '', 'Нажмите пробел для завершения']
+            fon = pygame.transform.scale(load_image('fon_final.jpg'), screen_size)
+
+            with open('progress_steps.txt', mode='w', encoding='UTF-8') as f:
+                f.write('0')
         screen.blit(fon, (0, 0))
         font = pygame.font.Font(None, 40)
         text_coord = 50
 
         for line in intro_text:
-            string_rendered = font.render(line, 1, pygame.Color('black'))
+            if lvl not in '45':
+                string_rendered = font.render(line, 1, pygame.Color('black'))
+            else:
+                string_rendered = font.render(line, 1, pygame.Color('white'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
@@ -116,6 +138,10 @@ def final_screen():
             f.write('2')
         elif lvl == '2':
             f.write('3')
+        elif lvl == '3':
+            f.write('4')
+        elif lvl == '4':
+            f.write('5')
         else:
             f.write('1')
 
@@ -198,8 +224,18 @@ def move(hero, movement):
 pygame.init()
 screen_size = (1000, 550)
 steps = 0
+with open('progress_steps.txt', mode='r', encoding='UTF-8') as f:
+    all_steps = f.read
 screen = pygame.display.set_mode(screen_size)
-player_image = load_image('person.png')
+# создание персонажа
+with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
+    extra = f.read()
+    if extra in '12':
+        player_image = load_image('person1.png')
+    elif extra in '34':
+        player_image = load_image('person2.png')
+    elif extra == '5':
+        player_image = load_image('person3.png')
 tile_width = tile_height = 50
 FPS = 60
 player = None
@@ -225,7 +261,7 @@ with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
         tile_images = {
             'wall': load_image('box.png'),
             'empty': load_image('floor.png'),
-            'final': load_image('final.png')
+            'final': load_image('final2.png')
         }
     elif extra == '3':
         level_map = load_level("map3.map")
@@ -233,6 +269,20 @@ with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
             'wall': load_image('box.png'),
             'empty': load_image('grass.png'),
             'final': load_image('final.png')
+        }
+    elif extra == '4':
+        level_map = load_level("map4.map")
+        tile_images = {
+            'wall': load_image('yellow_brick.png'),
+            'empty': load_image('floor.png'),
+            'final': load_image('final.png')
+        }
+    elif extra == '5':
+        level_map = load_level("map5.map")
+        tile_images = {
+            'wall': load_image('yellow_brick.png'),
+            'empty': load_image('wood.png'),
+            'final': load_image('final2.png')
         }
 
 # создание карты
