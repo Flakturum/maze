@@ -61,7 +61,7 @@ class Player(Sprite):
 def start_screen():
     with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
         lvl = f.read()
-        intro_text = ['Лабиринт', '', f'Уровень: {lvl}']
+        intro_text = ['Лабиринт', '', f'Уровень: {lvl}', '', '', '', '', '', '', '' 'Нажмите пробел для старта']
         if lvl == '1':
             fon = pygame.transform.scale(load_image('fon_green.jpg'), screen_size)
         elif lvl == '2':
@@ -69,8 +69,9 @@ def start_screen():
         elif lvl == '3':
             fon = pygame.transform.scale(load_image('fon_red.jpg'), screen_size)
         screen.blit(fon, (0, 0))
-        font = pygame.font.Font(None, 50)
+        font = pygame.font.Font(None, 40)
         text_coord = 50
+
         for line in intro_text:
             string_rendered = font.render(line, 1, pygame.Color('black'))
             intro_rect = string_rendered.get_rect()
@@ -85,14 +86,54 @@ def start_screen():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        return
+            pygame.display.flip()
+            clock.tick(FPS)
+
+
+def final_screen():
+    with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
+        lvl = f.read()
+        intro_text = ['Лабиринт', '', f'Уровень {lvl} пройден', f'Ходы: {steps}', '', '', '', 'Нажмите пробел для завершения']
+        fon = pygame.transform.scale(load_image('fon_purple.jpg'), screen_size)
+        screen.blit(fon, (0, 0))
+        font = pygame.font.Font(None, 40)
+        text_coord = 50
+
+        for line in intro_text:
+            string_rendered = font.render(line, 1, pygame.Color('black'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+
+    with (open('progress_lvl.txt', mode='w', encoding='UTF-8') as f):
+        if lvl == '1':
+            f.write('2')
+        elif lvl == '2':
+            f.write('3')
+        else:
+            f.write('1')
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        pygame.quit()
+                        sys.exit()
             pygame.display.flip()
             clock.tick(FPS)
 
 
 def load_level(filename):
-    filename = "data/" + filename
+    filename = "maps/" + filename
     with open(filename, 'r') as mapFile:
         level_map = [line.strip() for line in mapFile]
     max_width = max(map(len, level_map))
@@ -117,32 +158,50 @@ def generate_level(level):
             elif level[y][x] == '!':
                 Tile('empty', x, y)
                 Tile('final', x, y)
-                level[y][x] = "#"
+                level[y][x] = "!"
     return new_player, x, y
 
 
 def move(hero, movement):
+    global steps
     x, y = hero.pos
     if movement == "up":
+        if y > 0 and level_map[y - 1][x] == "!":
+            steps += 1
+            final_screen()
         if y > 0 and level_map[y - 1][x] == ".":
             hero.move(x, y - 1)
+            steps += 1
     elif movement == "down":
+        if y < max_y - 1 and level_map[y + 1][x] == "!":
+            steps += 1
+            final_screen()
         if y < max_y - 1 and level_map[y + 1][x] == ".":
             hero.move(x, y + 1)
+            steps += 1
     elif movement == "left":
+        if x > 0 and level_map[y][x - 1] == "!":
+            steps += 1
+            final_screen()
         if x > 0 and level_map[y][x - 1] == ".":
             hero.move(x - 1, y)
+            steps += 1
     elif movement == "right":
+        if x < max_x - 1 and level_map[y][x + 1] == '!':
+            steps += 1
+            final_screen()
         if x < max_x - 1 and level_map[y][x + 1] == ".":
             hero.move(x + 1, y)
+            steps += 1
 
 
 pygame.init()
-screen_size = (500, 500)
+screen_size = (1000, 550)
+steps = 0
 screen = pygame.display.set_mode(screen_size)
-FPS = 60
 player_image = load_image('person.png')
 tile_width = tile_height = 50
+FPS = 60
 player = None
 clock = pygame.time.Clock()
 sprite_group = SpriteGroup()
@@ -197,6 +256,6 @@ while running:
     screen.fill(pygame.Color("black"))
     sprite_group.draw(screen)
     hero_group.draw(screen)
-    clock.tick(FPS)
+    clock.tick(60)
     pygame.display.flip()
 pygame.quit()
