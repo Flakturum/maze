@@ -225,7 +225,7 @@ pygame.init()
 screen_size = (1000, 550)
 steps = 0
 with open('progress_steps.txt', mode='r', encoding='UTF-8') as f:
-    all_steps = f.read
+    all_steps = f.read()
 screen = pygame.display.set_mode(screen_size)
 # создание персонажа
 with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
@@ -236,19 +236,17 @@ with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
         player_image = load_image('person2.png')
     elif extra == '5':
         player_image = load_image('person3.png')
-tile_width = tile_height = 50
-FPS = 60
-player = None
-clock = pygame.time.Clock()
-sprite_group = SpriteGroup()
-hero_group = SpriteGroup()
+    tile_width = tile_height = 50
+    FPS = 60
+    player = None
+    clock = pygame.time.Clock()
+    sprite_group = SpriteGroup()
+    hero_group = SpriteGroup()
 
-# заставка
-start_screen()
+    # заставка
+    start_screen()
 
-# загрузка уровня
-with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
-    extra = f.read()
+    # загрузка уровня
     if extra == '1':
         level_map = load_level("map1.map")
         tile_images = {
