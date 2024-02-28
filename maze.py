@@ -3,6 +3,7 @@ import os
 import sys
 
 
+#  функция загрузки картинки
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
     try:
@@ -18,6 +19,7 @@ def load_image(name, color_key=None):
     return image
 
 
+# класс группы спрайтов
 class SpriteGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
@@ -27,6 +29,7 @@ class SpriteGroup(pygame.sprite.Group):
             sprite.get_event(event)
 
 
+# спрайт
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, group):
         super().__init__(group)
@@ -36,6 +39,7 @@ class Sprite(pygame.sprite.Sprite):
         pass
 
 
+# класс статус картинки/объекта
 class Tile(Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(sprite_group)
@@ -44,6 +48,7 @@ class Tile(Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
+# персонаж
 class Player(Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(hero_group)
@@ -58,6 +63,7 @@ class Player(Sprite):
             tile_width * self.pos[0] + 15, tile_height * self.pos[1] + 5)
 
 
+# заставка
 def start_screen():
     with open('progress_lvl.txt', mode='r', encoding='UTF-8') as f:
         lvl = f.read()
@@ -100,6 +106,7 @@ def start_screen():
             clock.tick(FPS)
 
 
+# подсчет результатов в конце уровня
 def final_screen():
     with open('progress_steps.txt', mode='a', encoding='UTF-8') as f:
         f.write(f' {steps}')
@@ -158,6 +165,7 @@ def final_screen():
             clock.tick(FPS)
 
 
+# загрузка уровня
 def load_level(filename):
     filename = "maps/" + filename
     with open(filename, 'r') as mapFile:
@@ -166,6 +174,7 @@ def load_level(filename):
     return list(map(lambda x: list(x.ljust(max_width, '.')), level_map))
 
 
+# создания уровня
 def generate_level(level):
     new_player, x, y = None, None, None
     for y in range(len(level)):
@@ -188,6 +197,7 @@ def generate_level(level):
     return new_player, x, y
 
 
+# перемещение
 def move(hero, movement):
     global steps
     x, y = hero.pos
@@ -221,6 +231,7 @@ def move(hero, movement):
             steps += 1
 
 
+# основная программа
 pygame.init()
 screen_size = (1000, 550)
 steps = 0
